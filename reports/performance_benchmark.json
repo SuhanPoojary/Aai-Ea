@@ -1,0 +1,95 @@
+{
+  "benchmark": {
+    "dataset": "C:\\Users\\Suhan Poojary\\Downloads\\AegisSupport_2.0_React_MCP_RAG\\aegissupport_v2\\data\\knowledge_base\\articles.json",
+    "query_count": 6,
+    "repetitions_per_query": 10,
+    "provider_calls": 0,
+    "token_usage": null,
+    "scope": "local TF-IDF retrieval and cache; no Groq calls"
+  },
+  "baseline": {
+    "refund_policy refund What is your refund policy?": {
+      "count": 10,
+      "average_ms": 2.746,
+      "median_ms": 2.219,
+      "p95_ms": 3.5
+    },
+    "refund_timeline billing How long does a refund take?": {
+      "count": 10,
+      "average_ms": 2.824,
+      "median_ms": 2.312,
+      "p95_ms": 3.973
+    },
+    "wrong_item order I received a damaged item.": {
+      "count": 10,
+      "average_ms": 3.087,
+      "median_ms": 2.672,
+      "p95_ms": 4.131
+    },
+    "delivery_delay order My shipment is delayed.": {
+      "count": 10,
+      "average_ms": 2.476,
+      "median_ms": 2.204,
+      "p95_ms": 3.209
+    },
+    "payment_failure billing My payment was deducted but the order failed.": {
+      "count": 10,
+      "average_ms": 2.948,
+      "median_ms": 2.477,
+      "p95_ms": 4.039
+    },
+    "cancel_order order Can I cancel my order?": {
+      "count": 10,
+      "average_ms": 3.576,
+      "median_ms": 3.458,
+      "p95_ms": 4.275
+    }
+  },
+  "optimized": {
+    "refund_policy refund What is your refund policy?": {
+      "count": 10,
+      "average_ms": 0.332,
+      "median_ms": 0.002,
+      "p95_ms": 0.006
+    },
+    "refund_timeline billing How long does a refund take?": {
+      "count": 10,
+      "average_ms": 0.076,
+      "median_ms": 0.001,
+      "p95_ms": 0.004
+    },
+    "wrong_item order I received a damaged item.": {
+      "count": 10,
+      "average_ms": 0.341,
+      "median_ms": 0.002,
+      "p95_ms": 0.005
+    },
+    "delivery_delay order My shipment is delayed.": {
+      "count": 10,
+      "average_ms": 0.194,
+      "median_ms": 0.003,
+      "p95_ms": 0.009
+    },
+    "payment_failure billing My payment was deducted but the order failed.": {
+      "count": 10,
+      "average_ms": 0.074,
+      "median_ms": 0.001,
+      "p95_ms": 0.004
+    },
+    "cancel_order order Can I cancel my order?": {
+      "count": 10,
+      "average_ms": 0.071,
+      "median_ms": 0.001,
+      "p95_ms": 0.005
+    }
+  },
+  "retrieval_quality": {
+    "top_k_ids_exact_match_rate": 1.0
+  },
+  "concurrency": {
+    "request_count": 48,
+    "workers": 8,
+    "total_ms": 12.113,
+    "average_ms": 0.252
+  }
+}

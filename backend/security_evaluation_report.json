@@ -1,0 +1,12 @@
+{
+  "total": 32,
+  "passed": 32,
+  "failed": 0,
+  "exit_status": 0,
+  "categories": [
+    "prompt_injection",
+    "authorization",
+    "tool_ownership",
+    "reviewer"
+  ]
+}
