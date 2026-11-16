@@ -1,0 +1,15 @@
+id,customer_id,order_id,issue,category,priority,team,status,sla_minutes,created_at,human_takeover
+TCK-AA311C0,C001,,My payment was deducted but my order failed ORD22001,billing,high,Billing Operations,Assigned,15,2026-10-25 11:48:36.333749,1
+TCK-78DC69C,C001,,What is your refund policy?,billing,medium,Billing Operations,Opened,60,2026-11-02 13:11:32.071226,0
+TCK-58EAA55,C001,,How long does a refund take?,billing,medium,Billing Operations,Opened,60,2026-11-02 13:11:54.305287,0
+TCK-BB810DA,C001,,"""I want to speak to a human support agent.""",support,high,Customer Support,Resolved,15,2026-11-02 13:44:02.976822,0
+TCK-B0473B4,C001,,I received a damaged product and need a replacement.,order,medium,Customer Support,Opened,60,2026-11-10 12:46:12.985269,0
+TCK-EDE8208,C001,,My order ORD33410 has not been delivered even after the expected date.,order,medium,Customer Support,Resolved,60,2026-11-10 12:46:15.091373,0
+TCK-A270581,C001,,I want to speak to a human supervisor.,support,high,Customer Support,Opened,15,2026-11-10 12:46:17.211197,0
+TCK-2A150BB,C001,,My issue is still unresolved.,support,high,Customer Support,Opened,15,2026-11-10 12:46:17.317138,0
+TCK-1181956,C001,,Duplicate complaint ORD33410,test-dedupe,medium,Customer Support,Opened,60,2026-11-10 12:48:04.799047,0
+TCK-D3A6F95,C002,,Synthetic delivery complaint ORD12006,order,medium,Customer Support,Resolved,60,2026-11-10 13:17:45.919044,0
+TCK-A7F8C5E,C001,,My order ORD33410 has not been delivered after the expected date,order,medium,Customer Support,Resolved,60,2026-11-10 13:57:49.613420,1
+TCK-71F4D9E,C001,,"My order ORD33410 has not been delivered after the expected date
+svg",order,medium,Customer Support,Assigned,60,2026-11-10 14:07:32.481745,1
+TCK-EDCD8F2,C001,ORD12345,I want to replace it,order,medium,Customer Support,Resolved,60,2026-11-10 14:18:43.889805,1

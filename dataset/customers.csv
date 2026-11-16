@@ -1,0 +1,13 @@
+id,name,tier,email,city,account_status
+C001,Aarav Mehta,Premium,aarav@example.test,Mumbai,Active
+C002,Diya Shah,Standard,diya@example.test,Pune,Active
+C003,Kabir Rao,Premium,kabir@example.test,Thane,Active
+C004,Mira Iyer,Standard,mira@example.test,Navi Mumbai,Active
+C005,Ishaan Patel,Gold,ishaan@example.test,Mumbai,Active
+C006,Anaya Kulkarni,Standard,anaya@example.test,Pune,Active
+C007,Reyansh Nair,Premium,reyansh@example.test,Bengaluru,Active
+C008,Sara Khan,Standard,sara@example.test,Hyderabad,Active
+C009,Vivaan Joshi,Gold,vivaan@example.test,Delhi,Active
+C010,Myra Desai,Standard,myra@example.test,Ahmedabad,Active
+C011,Arjun Menon,Premium,arjun@example.test,Kochi,Active
+C012,Aditi Rao,Standard,aditi@example.test,Chennai,Active

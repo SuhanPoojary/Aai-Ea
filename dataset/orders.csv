@@ -1,0 +1,14 @@
+id,customer_id,item,delivered_item,status,amount,payment_status,courier,eta
+ORD12006,C002,Mechanical Keyboard,,shipped,4299.0,success,BlueDart,Expected in 2 days
+ORD12007,C005,USB-C Hub,USB-A Hub H1,delivered,2199.0,success,Delhivery,Delivered
+ORD12008,C006,Desk Lamp D2,,delivered,1899.0,success,Delhivery,Delivered
+ORD12009,C007,Wireless Charger W1,,processing,1299.0,success,Aegis Express,Ships in 1–2 days
+ORD12010,C008,Premium Plan Annual,,paid,4999.0,success,Digital,Active
+ORD12011,C009,Mechanical Keyboard,,payment_failed,4299.0,debited_not_confirmed,—,Order confirmation pending
+ORD12012,C010,Noise-Cancelling Headphones X2,,shipped,8999.0,success,BlueDart,Expected in 3 days
+ORD12013,C011,USB-C Hub,,cancelled,2199.0,refunded,Delhivery,Cancelled and refunded
+ORD12014,C012,Smart Watch S5,,processing,12499.0,success,Aegis Express,Ships in 1–2 days
+ORD12345,C001,Noise-Cancelling Headphones X2,Wired Earbuds E1,delivered,8999.0,success,BlueDart,Delivered
+ORD22001,C004,Smart Watch S5,,payment_failed,12499.0,debited_not_confirmed,—,Order confirmation pending
+ORD33410,C001,Yoga Mat Pro,,processing,1499.0,success,Aegis Express,Ships in 1–2 days
+ORD44100,C003,Premium Plan Annual,,paid,4999.0,success,Digital,Active

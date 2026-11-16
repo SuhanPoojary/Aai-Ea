@@ -1,1 +1,0 @@
-Place the downloaded Bitext customer-support CSV in raw/. Normalize it using scripts/normalize_bitext.py. Policy documents used by RAG are in knowledge_base/articles.json. Fictional transactional demo records are seeded by backend/db/seed.py.
