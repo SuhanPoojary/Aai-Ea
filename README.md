@@ -481,12 +481,6 @@ Customers should only be able to access their own orders and tickets.
 
 Supervisor operations must be protected by supervisor authorization.
 
-**Security recommendations:**
-- Store credentials and API keys in environment variables.
-- Never commit `.env` files or access tokens.
-- Use `.env.example` to document required configuration without exposing secrets.
-- Use secure secrets and HTTPS in production.
-- Do not use demo credentials in a production deployment.
 
 ## 12. Performance Optimization
 
@@ -923,23 +917,9 @@ These should be considered release-validation items until the corresponding test
 - Additional MCP tools.
 - Production deployment with monitoring and scaling.
 
-## 20. Security Considerations
 
-Before deploying AegisSupport publicly:
 
-- Replace all demo credentials.
-- Use strong authentication secrets.
-- Store API keys securely.
-- Configure production database access.
-- Enable HTTPS.
-- Apply rate limiting to sensitive endpoints.
-- Validate all incoming user input.
-- Verify customer ownership for every order and ticket operation.
-- Restrict supervisor operations.
-- Avoid logging passwords, tokens or customer conversation content.
-- Test the application with multiple users and concurrent requests.
-
-## 21. Expected Benefits
+## 20. Expected Benefits
 
 AegisSupport aims to provide the following benefits:
 
@@ -952,7 +932,7 @@ AegisSupport aims to provide the following benefits:
 - Modular and maintainable AI-agent architecture.
 - Improved retrieval performance through optimization.
 
-## 22. Conclusion
+## 21. Conclusion
 
 AegisSupport demonstrates how Agentic AI can be integrated into a customer support platform using specialized AI agents, Retrieval-Augmented Generation, Model Context Protocol and backend automation.
 
@@ -960,30 +940,3 @@ The system combines conversational AI with structured customer data and supporte
 
 By separating responsibilities across specialized agents and integrating a customer portal with a supervisor dashboard, AegisSupport provides a modular foundation for intelligent customer support automation.
 
----
-
-## 23. Project Information
-
-**Project Name:** AegisSupport
-
-**Project Title:** Agentic AI-Based Customer Support System
-
-**Frontend:** React, TypeScript, Vite and Tailwind CSS
-
-**Backend:** Python and FastAPI
-
-**AI Integration:** Groq LLM, Multi-Agent Architecture
-
-**Knowledge Retrieval:** HuggingFace Embeddings, ChromaDB and TF-IDF
-
-**Tool Integration:** Model Context Protocol
-
-**Database:** SQLAlchemy with SQLite/PostgreSQL support
-
-**API Documentation:** `http://localhost:8001/docs`
-
-**Backend Health:** `http://localhost:8001/api/health`
-
-**Performance Metrics:** `http://localhost:8001/api/metrics` (protected endpoint)
-
-**Repository:** Add your GitHub repository URL here.
