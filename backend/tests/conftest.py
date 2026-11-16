@@ -1,11 +1,12 @@
 import os
+import uuid
 from pathlib import Path
 
 import pytest
 import json
 
 
-TEST_DB = Path(__file__).with_name("test_aegis.db")
+TEST_DB = Path(__file__).with_name(f"test_aegis_{uuid.uuid4().hex}.db")
 os.environ["DATABASE_URL"] = f"sqlite:///{TEST_DB}"
 os.environ["AEGIS_TOKEN_SECRET"] = "test-only-token-secret"
 os.environ["SUPERVISOR_EMAIL"] = "supervisor@example.test"

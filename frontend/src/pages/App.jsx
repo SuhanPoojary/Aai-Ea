@@ -206,6 +206,14 @@ export default function App() {
   }, []);
 
   useEffect(() => {
+    if (!profile?.id) return;
+    const storedConversationId = localStorage.getItem(
+      `aegis_conversation_${profile.id}`,
+    );
+    if (storedConversationId) setConversationId(storedConversationId);
+  }, [profile?.id]);
+
+  useEffect(() => {
     if (mode === "supervisor" && supervisorAuthenticated) loadSupervisor();
   }, [mode, supervisorAuthenticated, loadSupervisor]);
 
@@ -355,7 +363,14 @@ export default function App() {
         slots,
       });
       setCustomerResult(result);
-      setConversationId(result.conversation_id || conversationId);
+      const nextConversationId = result.conversation_id || conversationId;
+      setConversationId(nextConversationId);
+      if (profile?.id && nextConversationId) {
+        localStorage.setItem(
+          `aegis_conversation_${profile.id}`,
+          nextConversationId,
+        );
+      }
       setCustomerTrace(result.trace || []);
       animateTrace(result.trace || []);
       setCustomerMessages(previous => [

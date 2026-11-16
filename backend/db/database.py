@@ -56,6 +56,9 @@ def ensure_schema():
         "agent_events": {
             "correlation_id": "VARCHAR(80) DEFAULT ''",
         },
+        "tickets": {
+            "order_id": "VARCHAR(30)",
+        },
     }
     with engine.begin() as connection:
         for table, columns in additions.items():

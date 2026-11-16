@@ -88,8 +88,26 @@ def run(text: str):
                 "shipment status",
                 "when will my order arrive",
                 "when will it arrive",
+                "status of my order",
+                "what is the status of my order",
             ],
             "order", "medium", "none",
+        ),
+        (
+            "ticket_status",
+            [
+                "ticket status", "support ticket", "case status",
+                "complaint update", "ticket update", "case update",
+                "any update", "what about now", "is it resolved",
+                "what happened to my complaint", "status of my complaint",
+                "status of my ticket", "update on my issue",
+            ],
+            "support", "low", "none",
+        ),
+        (
+            "payment_failure",
+            ["payment issue", "problem with payment", "payment problem"],
+            "billing", "high", "none",
         ),
         (
             "fraud",
@@ -154,6 +172,17 @@ def run(text: str):
             [
                 "return my order", "return an item", "return this item",
                 "send it back", "start a return", "request a return",
+                "return or replacement", "return replacement",
+            ],
+            "order", "medium", "none",
+        ),
+        (
+            "replacement_request",
+            [
+                "replace my order", "replace this order", "replace the item",
+                "replace it", "need a replacement", "want a replacement",
+                "request a replacement", "replacement for",
+                "want to replace", "replace order",
             ],
             "order", "medium", "none",
         ),
@@ -175,7 +204,9 @@ def run(text: str):
             [
                 "hasn't arrived", "has not arrived", "not arrived",
                 "still waiting for", "late delivery", "delivery is late",
-                    "shipment is delayed", "shipment delayed", "delivery delayed",
+                "shipment is delayed", "shipment delayed", "delivery delayed",
+                "not been delivered", "wasn't delivered", "was not delivered",
+                "expected date", "past the expected date", "overdue",
             ],
             "order", "medium", "none",
         ),
@@ -184,9 +215,19 @@ def run(text: str):
             [
                 "payment was deducted", "payment deducted",
                 "debited but", "payment failed",
-                "charged but order failed",
+                "charged but order failed", "money was deducted",
+                "money deducted", "order was not placed", "order wasn't placed",
+                "order failed after payment",
             ],
             "billing", "high", "none",
+        ),
+        (
+            "complaint",
+            [
+                "still unresolved", "issue is unresolved", "not resolved",
+                "hasn't been resolved", "has not been resolved",
+            ],
+            "support", "high", "none",
         ),
         (
             "account_locked",
@@ -238,6 +279,18 @@ def run(text: str):
             matched_rule = name
             break
 
+    if re.search(r"\bTCK-[A-Z0-9]+\b", low, re.I) and any(
+        word in low
+        for word in ("status", "update", "resolved", "closed", "assigned", "progress")
+    ):
+        fallback.update(
+            intent="ticket_status",
+            category="support",
+            priority="low",
+            risk="none",
+        )
+        matched_rule = "ticket_status"
+
     # Rule matches are a high-confidence local router and do not need a
     # network round trip. Unmatched text still uses the broader classifier.
     if matched_rule and DETERMINISTIC_INTENT_ROUTING:
@@ -270,9 +323,12 @@ def run(text: str):
         for word in ("frustrated", "angry", "upset", "terrible", "disappointed")
     ):
         out["sentiment"] = "negative"
-    if any(
-        phrase in low
-        for phrase in ("frustrated", "angry", "upset", "terrible", "disappointed")
+    if (
+        any(
+            phrase in low
+            for phrase in ("frustrated", "angry", "upset", "terrible", "disappointed")
+        )
+        and out["intent"] in {"general_question", "greeting", "complaint"}
     ):
         out["intent"] = "complaint"
         out["category"] = "support"

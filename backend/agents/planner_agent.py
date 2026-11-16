@@ -5,7 +5,8 @@ from schemas import ActionPlan
 def run(text,intent,context,docs):
     t=time.perf_counter(); order=context.get('order') or {}; intent_name=intent.get('intent','other')
     actions=[]
-    if intent_name in ('wrong_item', 'return_request'): actions=['get_order','initiate_return']
+    if intent_name in ('wrong_item', 'return_request', 'replacement_request'):
+        actions=['get_order','initiate_return']
     elif intent_name=='payment_failure': actions=['get_order','check_refund_eligibility']
     elif intent_name in ('refund', 'refund_issue'): actions=['check_refund_eligibility']
     elif intent_name in ('refund_policy', 'refund_timeline', 'change_of_mind_return'):

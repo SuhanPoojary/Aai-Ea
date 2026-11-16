@@ -111,6 +111,9 @@ class Ticket(Base):
 
     id: Mapped[str] = mapped_column(String(30), primary_key=True)
     customer_id: Mapped[str] = mapped_column(ForeignKey("customers.id"), index=True)
+    order_id: Mapped[str | None] = mapped_column(
+        ForeignKey("orders.id"), nullable=True, index=True
+    )
     issue: Mapped[str] = mapped_column(Text)
     category: Mapped[str] = mapped_column(String(50), default="other")
     priority: Mapped[str] = mapped_column(String(20), default="medium")
@@ -119,6 +122,22 @@ class Ticket(Base):
     sla_minutes: Mapped[int] = mapped_column(Integer, default=60)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now)
     human_takeover: Mapped[bool] = mapped_column(Boolean, default=False)
+
+
+class ConversationState(Base):
+    __tablename__ = "conversation_states"
+
+    conversation_id: Mapped[str] = mapped_column(String(60), primary_key=True)
+    customer_id: Mapped[str] = mapped_column(ForeignKey("customers.id"), index=True)
+    current_intent: Mapped[str] = mapped_column(String(80), default="general_question")
+    previous_intent: Mapped[str] = mapped_column(String(80), default="")
+    selected_order_id: Mapped[str] = mapped_column(String(30), default="")
+    selected_ticket_id: Mapped[str] = mapped_column(String(30), default="")
+    active_issue_category: Mapped[str] = mapped_column(String(50), default="other")
+    last_action: Mapped[str] = mapped_column(String(120), default="")
+    pending_clarification: Mapped[str] = mapped_column(Text, default="")
+    recent_context: Mapped[str] = mapped_column(Text, default="[]")
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now)
 
 
 class Conversation(Base):

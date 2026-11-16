@@ -469,18 +469,22 @@ def update_ticket(
     db: Session = Depends(get_db),
 ):
     require_supervisor(authorization, db)
-    allowed = {
-        "Opened",
-        "Assigned",
-        "Pending customer",
-        "Resolved",
-        "Closed",
+    status_by_key = {
+        status.casefold(): status
+        for status in (
+            "Opened",
+            "Assigned",
+            "Pending customer",
+            "In Progress",
+            "Resolved",
+            "Closed",
+        )
     }
-
-    if payload.status not in allowed:
+    normalized_status = status_by_key.get(payload.status.strip().casefold())
+    if not normalized_status:
         raise HTTPException(
             status_code=400,
-            detail=f"Invalid ticket status. Allowed values: {sorted(allowed)}",
+            detail=f"Invalid ticket status. Allowed values: {sorted(status_by_key.values())}",
         )
 
     ticket = db.get(Ticket, ticket_id)
@@ -491,9 +495,9 @@ def update_ticket(
             detail="Ticket not found.",
         )
 
-    ticket.status = payload.status
+    ticket.status = normalized_status
 
-    if payload.status == "Assigned":
+    if normalized_status == "Assigned":
         ticket.human_takeover = True
 
     db.commit()

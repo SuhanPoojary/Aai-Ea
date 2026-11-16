@@ -187,11 +187,34 @@ def run(text, intent, context, docs, results, decision, ticket, history=None):
             "along the details you've shared so you won't need to repeat them."
         )
     elif decision.get("escalate"):
-        fallback = (
-            f"I'm sorry you're dealing with this. I've sent it to "
-            f"{decision.get('team', 'our support team')} for review. "
-            f"They're expected to respond within {decision.get('sla_minutes', 60)} minutes."
-        )
+        if ticket and ticket.get("ticket_id") and ticket.get("status"):
+            detail = (
+                "I've created a return request and support ticket"
+                if intent_name in {"wrong_item", "return_request"}
+                else "I've created a support ticket"
+            )
+            human_context = (
+                " so a human support specialist can take over"
+                if intent_name == "human_assistance"
+                else ""
+            )
+            workflow_context = (
+                " The return request remains subject to warehouse confirmation."
+                if intent_name in {"wrong_item", "return_request"}
+                else ""
+            )
+            fallback = (
+                f"I'm sorry you're dealing with this. {detail} "
+                f"{ticket['ticket_id']}{human_context} and sent it to "
+                f"{decision.get('team', 'our support team')} for review. Its current "
+                f"status is {ticket['status']}; the initial response target is "
+                f"{decision.get('sla_minutes', 60)} minutes.{workflow_context}"
+            )
+        else:
+            fallback = (
+                "I'm sorry, but I couldn't save a support ticket for this issue. "
+                "I won't claim that it was escalated until the ticket is persisted."
+            )
 
     elif any(
         r.get("tool") == "initiate_return" and r.get("ok")
@@ -285,6 +308,61 @@ def run(text, intent, context, docs, results, decision, ticket, history=None):
                 "about what you need?"
             )
 
+    if intent_name == "payment_failure":
+        if not selected_order and not matching_orders:
+            fallback = (
+                "I can help investigate the payment issue. Please share the "
+                "order ID so I can verify the order and payment status."
+            )
+        elif selected_order:
+            fallback = (
+                f"I checked order {selected_order.get('id')}. Its order status is "
+                f"{selected_order.get('status', 'unknown').replace('_', ' ')}, "
+                f"and the payment status is "
+                f"{selected_order.get('payment_status', 'unknown').replace('_', ' ')}. "
+                "I will use those verified details to determine the next payment "
+                "or refund-review step; I won't promise a refund without confirmation."
+            )
+
+    if intent_name in {"return_request", "replacement_request"} and selected_order:
+        fallback = (
+            f"I checked order {selected_order.get('id')}. It is currently "
+            f"{selected_order.get('status', 'unknown').replace('_', ' ')}. "
+            "I will verify delivery and replacement eligibility before taking "
+            "action. A replacement is not confirmed until the return workflow "
+            "reports success."
+        )
+
+    if decision.get("escalate"):
+        if ticket and ticket.get("ticket_id") and ticket.get("status"):
+            detail = (
+                "I've created a return request and support ticket"
+                if intent_name in {"wrong_item", "return_request"}
+                else "I've created a support ticket"
+            )
+            human_context = (
+                " so a human support specialist can take over"
+                if intent_name == "human_assistance"
+                else ""
+            )
+            workflow_context = (
+                " The return request remains subject to warehouse confirmation."
+                if intent_name in {"wrong_item", "return_request"}
+                else ""
+            )
+            fallback = (
+                f"I'm sorry you're dealing with this. {detail} "
+                f"{ticket['ticket_id']}{human_context} and sent it to "
+                f"{decision.get('team', 'our support team')} for review. Its current "
+                f"status is {ticket['status']}; the initial response target is "
+                f"{decision.get('sla_minutes', 60)} minutes.{workflow_context}"
+            )
+        else:
+            fallback = (
+                "I'm sorry, but I couldn't save a support ticket for this issue. "
+                "I won't claim that it was escalated until the ticket is persisted."
+            )
+
     # Give the model structured facts instead of an unstructured Python dict string.
     prompt_data = {
         "customer_message": text,
@@ -348,17 +426,26 @@ Requirements:
 - Return valid JSON with exactly one key: {"reply": "natural response"}.
 """
 
-    try:
-        output = llm_json(
-            system_prompt,
-            json.dumps(prompt_data, ensure_ascii=False, default=str),
-            {"reply": fallback},
-        )
-        reply = output.get("reply") if isinstance(output, dict) else None
-        if not isinstance(reply, str) or not reply.strip():
-            reply = fallback
-    except Exception:
+    deterministic_intents = {
+        "payment_failure",
+        "return_request",
+        "replacement_request",
+        "ticket_status",
+    }
+    if intent_name in deterministic_intents:
         reply = fallback
+    else:
+        try:
+            output = llm_json(
+                system_prompt,
+                json.dumps(prompt_data, ensure_ascii=False, default=str),
+                {"reply": fallback},
+            )
+            reply = output.get("reply") if isinstance(output, dict) else None
+            if not isinstance(reply, str) or not reply.strip():
+                reply = fallback
+        except Exception:
+            reply = fallback
 
     sources = []
     if docs and intent_name not in list_intents:

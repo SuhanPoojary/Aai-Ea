@@ -55,8 +55,68 @@ def check_account(db: Session, customer_id: str):
     c=db.get(Customer,customer_id)
     return {"ok":bool(c),"customer_id":customer_id,"account_status":c.account_status if c else "unknown","tier":c.tier if c else "unknown"}
 
-def create_ticket(db: Session, customer_id: str, issue: str, category: str, priority: str, team: str, sla_minutes: int):
+def create_ticket(
+    db: Session,
+    customer_id: str,
+    issue: str,
+    category: str,
+    priority: str,
+    team: str,
+    sla_minutes: int,
+    order_id: str | None = None,
+):
+    normalized_issue = " ".join((issue or "").lower().split())
+    existing = db.query(Ticket).filter(
+        Ticket.customer_id == customer_id,
+        Ticket.category == category,
+        Ticket.status.in_(("Opened", "Assigned", "Pending customer")),
+    ).all()
+    for ticket in existing:
+        existing_issue = " ".join((ticket.issue or "").lower().split())
+        stop_words = {"a", "an", "and", "for", "issue", "order", "the", "with"}
+        issue_tokens = set(normalized_issue.split()) - stop_words
+        existing_tokens = set(existing_issue.split()) - stop_words
+        shared_issue_ratio = (
+            len(issue_tokens & existing_tokens) / min(len(issue_tokens), len(existing_tokens))
+            if issue_tokens and existing_tokens
+            else 0
+        )
+        if existing_issue == normalized_issue or (
+            normalized_issue and ticket.issue and
+            any(token.startswith("ord") for token in normalized_issue.split())
+            and any(token.startswith("ord") for token in existing_issue.split())
+            and next((token for token in normalized_issue.split() if token.startswith("ord")), None)
+            == next((token for token in existing_issue.split() if token.startswith("ord")), None)
+            and shared_issue_ratio >= 0.6
+            and (not order_id or ticket.order_id == order_id)
+        ):
+            return {
+                "ok": True,
+                "ticket_id": ticket.id,
+                "team": ticket.team,
+                "priority": ticket.priority,
+                "sla_minutes": ticket.sla_minutes,
+                "status": ticket.status,
+                "duplicate": True,
+            }
     tid='TCK-'+uuid.uuid4().hex[:7].upper()
-    ticket=Ticket(id=tid,customer_id=customer_id,issue=issue,category=category,priority=priority,team=team,sla_minutes=sla_minutes,status='Opened',created_at=datetime.now(timezone.utc),human_takeover=False)
-    db.add(ticket); db.commit()
+    ticket=Ticket(
+        id=tid,
+        customer_id=customer_id,
+        order_id=order_id,
+        issue=issue,
+        category=category,
+        priority=priority,
+        team=team,
+        sla_minutes=sla_minutes,
+        status='Opened',
+        created_at=datetime.now(timezone.utc),
+        human_takeover=False,
+    )
+    try:
+        db.add(ticket)
+        db.commit()
+    except Exception:
+        db.rollback()
+        return {"ok": False, "message": "Support ticket could not be saved."}
     return {"ok":True,"ticket_id":tid,"team":team,"priority":priority,"sla_minutes":sla_minutes,"status":"Opened"}
