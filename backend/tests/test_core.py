@@ -1,7 +1,7 @@
 from fastapi.testclient import TestClient
 
 from db.database import SessionLocal
-from db.models import ReturnRequest, UserAccount
+from db.models import ConversationState, ReturnRequest, UserAccount
 from mcp_server.business_tools import initiate_return
 from agents.reviewer_agent import run as review_plan
 
@@ -68,3 +68,67 @@ def test_authenticated_chat_contains_reviewer_and_response_metadata():
     body = response.json()
     assert any(item["agent"] == "Reviewer Agent" for item in body["trace"])
     assert body["response_metadata"]["response_version"] == "response-v2"
+
+
+def test_ticket_status_reply_identifies_ticket_and_pending_status():
+    from orchestrator.master_orchestrator import ticket_status_reply
+
+    reply = ticket_status_reply({
+        "id": "TCK-TEST1",
+        "status": "Pending customer",
+    })
+    assert reply == (
+        "Ticket TCK-TEST1 status: Pending customer. "
+        "Our support team is waiting for additional information from you."
+    )
+
+
+def test_memory_restores_and_clears_pending_clarification():
+    from agents.memory_agent import run as memory_run, save_state
+
+    conversation_id = "CONV-MISSING-ORDER"
+    with SessionLocal() as db:
+        save_state(
+            db,
+            "C001",
+            conversation_id,
+            category="payment_failure",
+            last_action="awaiting_order_selection",
+            pending_clarification="order_id",
+            history=[{"role": "assistant", "content": "Which order should I check?"}],
+        )
+        result, _ = memory_run(
+            [],
+            "yoga",
+            {},
+            db=db,
+            customer_id="C001",
+            conversation_id=conversation_id,
+            intent="payment_failure",
+        )
+        assert result["slots"]["pending_clarification"] == "order_id"
+        assert result["slots"]["category"] == "payment_failure"
+        assert result["slots"]["last_action"] == "awaiting_order_selection"
+
+        save_state(
+            db,
+            "C001",
+            conversation_id,
+            order_id="ORD12345",
+            pending_clarification="",
+        )
+        db.expire_all()
+        persisted = db.query(ConversationState).filter_by(
+            conversation_id=conversation_id,
+            customer_id="C001",
+        ).first()
+        assert persisted.pending_clarification == ""
+        cleared = memory_run(
+            [],
+            "check that order",
+            {},
+            db=db,
+            customer_id="C001",
+            conversation_id=conversation_id,
+        )[0]
+        assert "pending_clarification" not in cleared["slots"]

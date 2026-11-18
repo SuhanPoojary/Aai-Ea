@@ -6,26 +6,37 @@ from db.models import Customer, Order, Ticket
 
 
 def find_matching_orders(message, orders):
-    """Find orders whose product names match words in the message."""
     import re
+
+    stop_words = {
+        "my", "the", "order", "about", "for",
+        "is", "a", "an", "of", "to", "on",
+        "please", "i", "want", "need"
+    }
 
     words = {
         word.lower()
         for word in re.findall(r"[a-zA-Z0-9]+", message or "")
-        if len(word) > 2
+        if len(word) > 2 and word.lower() not in stop_words
     }
+
     if not words:
         return []
 
     matches = []
+
     for order in orders:
         name_words = {
             word.lower()
-            for word in re.findall(r"[a-zA-Z0-9]+", order.item)
+            for word in re.findall(r"[a-zA-Z0-9]+", order.item or "")
             if len(word) > 2
         }
-        if name_words and len(words & name_words) / len(name_words) >= 0.4:
+
+        matched_words = words & name_words
+
+        if matched_words and len(matched_words) / len(words) >= 0.5:
             matches.append(order)
+
     return matches
 
 

@@ -65,6 +65,15 @@ def run(history, text, slots, db=None, customer_id=None, conversation_id=None, i
             new.setdefault("order_id", persisted.selected_order_id)
         if persisted.selected_ticket_id:
             new.setdefault("ticket_id", persisted.selected_ticket_id)
+        if persisted.pending_clarification:
+            new.setdefault(
+                "pending_clarification",
+                persisted.pending_clarification
+            )
+        if persisted.active_issue_category:
+            new.setdefault("category", persisted.active_issue_category)
+        if persisted.last_action:
+            new.setdefault("last_action", persisted.last_action)
     import re
     m=re.search(r'\bORD[A-Z0-9-]*\d[A-Z0-9-]*\b',text,re.I)
     if m: new['order_id']=m.group(0).upper()

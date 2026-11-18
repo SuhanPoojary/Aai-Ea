@@ -52,17 +52,21 @@ def detect_ticket_id(message):
 
 
 def ticket_status_reply(ticket):
+    ticket_id = ticket.get("id", "your ticket")
+    status = ticket.get("status", "Unknown")
     messages = {
         "Opened": "Your ticket is open and awaiting support review.",
         "Assigned": "Your ticket has been assigned to a support representative.",
-        "Pending customer": "We need additional information from you.",
+        "Pending customer": (
+            "Our support team is waiting for additional information from you."
+        ),
         "In Progress": "Our support team is working on your issue.",
         "Resolved": "Your issue has been marked as resolved by our support team.",
         "Closed": "Your ticket has been closed. Contact support if the issue persists.",
     }
-    return messages.get(
-        ticket["status"],
-        f"Your ticket is currently {ticket['status']}.",
+    return (
+        f"Ticket {ticket_id} status: {status}. "
+        f"{messages.get(status, 'Our support team has not provided further details yet.')}"
     )
 
 
@@ -125,21 +129,23 @@ def ticket_status_lookup(
 
 
 def is_ticket_follow_up(message):
-    text = (message or "").lower()
-    return (
-        re.search(r"\b(status|update|resolved|closed|assigned|progress)\b", text)
-        or any(
-            phrase in text
-            for phrase in (
-                "what's the status",
-                "whats the status",
-                "what about now",
-                "any update",
-                "has it been resolved",
-                "what happened to my complaint",
-            )
-        )
-    )
+    text = (message or "").lower().strip()
+
+    patterns = [
+        r"\b(status|update|resolved|solved|closed|assigned|progress)\b",
+        r"\bof my ticket\b",
+        r"\bof the ticket\b",
+        r"\bwhat happened to (my |the )?ticket\b",
+        r"\bhas the issue been solved\b",
+        r"\bis the issue solved\b",
+        r"\bwhat happened to my complaint\b",
+        r"\bwhat's the status\b",
+        r"\bwhats the status\b",
+        r"\bany update\b",
+        r"\bany progress\b",
+    ]
+
+    return any(re.search(pattern, text) for pattern in patterns)
 
 
 def is_tracking_request(message, intent):
@@ -541,6 +547,7 @@ def process_message(db: Session, customer_id: str, message: str, conversation_id
                 order_id=order_id,
                 intent=intent.get("intent"),
                 category=intent.get("category"),
+                pending_clarification="",
                 history=history,
             )
         if order_id and not ctx.get("order"):
@@ -600,6 +607,16 @@ def process_message(db: Session, customer_id: str, message: str, conversation_id
             }
         missing_order_reply = clarification_for_missing_order(intent, ctx)
         if missing_order_reply:
+            save_state(
+                db,
+                customer_id,
+                cid,
+                intent=intent.get("intent"),
+                category=intent.get("category"),
+                last_action="awaiting_order_selection",
+                pending_clarification="order_id",
+                history=history,
+            )
             trace.append({
                 "agent": "Master Orchestrator",
                 "action": "Request missing order reference",
