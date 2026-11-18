@@ -1,7 +1,10 @@
 
-const BASE = (import.meta.env.VITE_API_URL || "http://localhost:8001/api")
-  .replace(/\/$/, "");
-
+const BASE = (
+  import.meta.env.VITE_API_URL ||
+  (import.meta.env.DEV
+    ? "http://localhost:8001/api"
+    : "https://aegissupport-api.onrender.com/api")
+).replace(/\/$/, "");
 let token = localStorage.getItem("aegis_access_token") || "";
 
 export function setAccessToken(value) {
