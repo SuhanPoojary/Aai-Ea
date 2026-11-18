@@ -1,4 +1,6 @@
+
 # yaml-language-server: $schema=https://render.com/schema/render.yaml.json
+
 services:
   - type: web
     name: aegissupport-api
@@ -49,13 +51,9 @@ services:
   - type: web
     name: aegissupport-frontend
     runtime: static
-    plan: free
     rootDir: frontend
     buildCommand: npm ci && npm run build
-    staticPublishPath: dist
-    envVars:
-      - key: VITE_API_URL
-        value: https://aegissupport-api.onrender.com/api
+    staticPublishPath: ./dist
     routes:
       - type: rewrite
         source: /*
